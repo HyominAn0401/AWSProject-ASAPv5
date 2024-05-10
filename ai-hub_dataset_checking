@@ -1,0 +1,39 @@
+import json
+from collections import Counter
+
+# COCO annotation 파일 경로
+annotation_file = '/Users/user/Downloads/CoCo/coco_astrophysics.json'
+
+# COCO annotation 파일 읽기
+with open(annotation_file, 'r') as f:
+    coco_data = json.load(f)
+
+# COCO 데이터셋에 포함된 클래스 레이블 추출
+categories = coco_data['categories']
+class_names = [category['name'] for category in categories]
+
+# 클래스 레이블 별로 객체 수를 세기
+object_counts = Counter()
+for annotation in coco_data['annotations']:
+    category_id = annotation['category_id']
+    if 0 < category_id <= len(class_names):
+        class_name = class_names[category_id - 1]  # category_id는 1부터 시작함
+        object_counts[class_name] += 1
+    else:
+        print(f"Invalid category_id: {category_id}")
+
+# 클래스 별 객체 수 출력
+print("객체 분포:")
+for class_name, count in object_counts.items():
+    print(f"{class_name}: {count}")
+
+# 객체 수를 그래프로 시각화
+import matplotlib.pyplot as plt
+
+plt.figure(figsize=(12, 6))
+plt.bar(object_counts.keys(), object_counts.values())
+plt.xticks(rotation=90)
+plt.xlabel('Class')
+plt.ylabel('Number of Objects')
+plt.title('Object Distribution in COCO Dataset')
+plt.show()
